@@ -1,4 +1,4 @@
-package com.chatsample.chat.data.source;
+package com.chatsample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +9,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chatsample.R;
+import com.chatsample.chat.data.source.ChatInfo;
+import com.chatsample.chat.data.source.ChatRepository;
+import com.chatsample.chat.data.source.QBDataSource;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
@@ -98,7 +101,32 @@ public class CreateDialogActivity extends AppCompatActivity {
                 chatInfo.listingId, new QBDataSource.Callback<QBDialog, QBResponseException>() {
                     @Override
                     public void onSuccess(QBDialog qbDialog) {
-                        info.setText("Already: " + qbDialog.toString());
+                        if (qbDialog == null) {
+                            ChatRepository.getInstance().createGroupChatDialog(
+                                    name.getText().toString(),
+                                    16567158,
+                                    ChatRepository.getInstance().getUser().getId(),
+                                    chatInfo.createQBDialogCustomData()
+                                    , new QBDataSource.Callback<QBDialog, QBResponseException>() {
+                                        @Override
+                                        public void onSuccess(QBDialog qbDialog) {
+                                            setResult(RESULT_OK);
+                                            finish();
+                                        }
+
+                                        @Override
+                                        public void onError(QBResponseException e) {
+                                            setResult(RESULT_CANCELED);
+                                            finish();
+
+                                        }
+                                    }
+
+                            );
+                        } else
+                            info.setText("Already: " + qbDialog.toString());
+
+
                     }
 
                     @Override
@@ -109,27 +137,6 @@ public class CreateDialogActivity extends AppCompatActivity {
                                 info.setText(e.toString());
                             }
                         });
-                        ChatRepository.getInstance().createGroupChatDialog(
-                                name.getText().toString(),
-                                16515013,
-                                ChatRepository.getInstance().getUser().getId(),
-                                chatInfo.createCustomData()
-                                , new QBDataSource.Callback<QBDialog, QBResponseException>() {
-                                    @Override
-                                    public void onSuccess(QBDialog qbDialog) {
-                                        setResult(RESULT_OK);
-                                        finish();
-                                    }
-
-                                    @Override
-                                    public void onError(QBResponseException e) {
-                                        setResult(RESULT_CANCELED);
-                                        finish();
-
-                                    }
-                                }
-
-                        );
 
 
                     }
